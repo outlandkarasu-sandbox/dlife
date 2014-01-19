@@ -32,18 +32,6 @@ class Game {
      *  ゲームの開始
      */
     void run() {
-        // 初期化処理
-        initialize();
-        scope(exit) finalize();
-
-        // とりあえず待つ
-        SDL_Delay(5000);
-    }
-
-protected:
-
-    /// 初期化処理
-    void initialize() {
         // ウィンドウの生成・表示
         window_ = enforceSdl(SDL_CreateWindow(
                     toStringz(title_),
@@ -51,13 +39,33 @@ protected:
                     SDL_WINDOWPOS_UNDEFINED,
                     width_,
                     height_,
-                    SDL_WINDOW_SHOWN));
-    }
+                    SDL_WINDOW_HIDDEN));
+        scope(exit) {
+            SDL_DestroyWindow(window_);
+            window_ = null;
+        }
 
-    /// 終了処理
-    void finalize() {
-        // ウィンドウの破棄
-        SDL_DestroyWindow(window_);
+        // レンダラーの生成
+        renderer_ = enforceSdl(SDL_CreateRenderer(
+                    window_,
+                    -1,
+                    SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC));
+        scope(exit) {
+            SDL_DestroyRenderer(renderer_);
+            renderer_ = null;
+        }
+
+        // レンダラーのクリア
+        enforceSdl(SDL_RenderClear(renderer_) == 0);
+
+        // 描画内容の反映
+        SDL_RenderPresent(renderer_);
+
+        // ウィンドウの表示
+        SDL_ShowWindow(window_);
+
+        // とりあえず待つ
+        SDL_Delay(5000);
     }
 
 private:
@@ -73,5 +81,8 @@ private:
 
     /// ウィンドウ
     SDL_Window* window_;
+
+    /// レンダラー
+    SDL_Renderer* renderer_;
 }
 

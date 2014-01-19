@@ -1,0 +1,12 @@
+{
+	"name": "dlife",
+        "targetType": "executable",
+	"description": "A Conway's game of life implementation written by D language.",
+	"copyright": "Copyright © 2014, outlandkarasu",
+	"authors": ["outlandkarasu"],
+	"dependencies": {
+                "derelict-sdl2": "~master"
+	},
+        "buildOptions": ["unittests"]
+
+}

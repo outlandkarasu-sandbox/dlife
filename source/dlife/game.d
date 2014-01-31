@@ -73,6 +73,8 @@ protected:
      *      renderer = 描画用レンダラ
      */
     void draw(SDL_Renderer* renderer) {
+        SDL_SetRenderDrawColor(renderer, Uint8.max, Uint8.max, Uint8.max, Uint8.max);
+        SDL_RenderDrawPoint(renderer, 100, 100);
     }
 
     /**
@@ -96,6 +98,7 @@ protected:
             }
 
             // 描画のクリア
+            SDL_SetRenderDrawColor(renderer, 0, 0, 0, Uint8.max);
             enforceSdl(SDL_RenderClear(renderer) == 0);
 
             // 画面描画

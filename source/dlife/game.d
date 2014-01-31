@@ -33,7 +33,7 @@ class Game {
      */
     void run() {
         // ウィンドウの生成・表示
-        window_ = enforceSdl(SDL_CreateWindow(
+        auto window = enforceSdl(SDL_CreateWindow(
                     toStringz(title_),
                     SDL_WINDOWPOS_UNDEFINED,
                     SDL_WINDOWPOS_UNDEFINED,
@@ -41,31 +41,70 @@ class Game {
                     height_,
                     SDL_WINDOW_HIDDEN));
         scope(exit) {
-            SDL_DestroyWindow(window_);
-            window_ = null;
+            SDL_DestroyWindow(window);
         }
 
         // レンダラーの生成
-        renderer_ = enforceSdl(SDL_CreateRenderer(
-                    window_,
+        auto renderer = enforceSdl(SDL_CreateRenderer(
+                    window,
                     -1,
                     SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC));
         scope(exit) {
-            SDL_DestroyRenderer(renderer_);
-            renderer_ = null;
+            SDL_DestroyRenderer(renderer);
+            renderer = null;
         }
 
         // レンダラーのクリア
-        enforceSdl(SDL_RenderClear(renderer_) == 0);
+        enforceSdl(SDL_RenderClear(renderer) == 0);
 
         // 描画内容の反映
-        SDL_RenderPresent(renderer_);
+        SDL_RenderPresent(renderer);
 
         // ウィンドウの表示
-        SDL_ShowWindow(window_);
+        SDL_ShowWindow(window);
 
-        // とりあえず待つ
-        SDL_Delay(5000);
+        mainLoop(renderer);
+    }
+
+protected:
+
+    /**
+     *  メインループ
+     *
+     *  Params:
+     *      renderer = 描画用レンダラ
+     */
+    void mainLoop(SDL_Renderer* renderer) {
+        for(bool quit = false; !quit;) {
+            SDL_Event event;
+            while(SDL_PollEvent(&event)) {
+                quit = !processEvent(event);
+            }
+
+            SDL_Delay(300);
+        }
+    }
+
+    /**
+     *  イベント処理
+     *
+     *  Params:
+     *      event = イベント情報
+     *  Returns:
+     *      処理を続ける場合はtrue。終了する場合はfalse。
+     */
+    bool processEvent(const ref SDL_Event event) {
+        switch(event.type) {
+            // マウスボタンクリック。終了する。
+            case SDL_MOUSEBUTTONDOWN:
+                return false;
+            // 終了イベント
+            case SDL_QUIT:
+                return false;
+            // その他。無視する
+            default:
+                return true;
+        }
     }
 
 private:
@@ -78,11 +117,5 @@ private:
 
     /// ウィンドウの高さ
     immutable uint height_;
-
-    /// ウィンドウ
-    SDL_Window* window_;
-
-    /// レンダラー
-    SDL_Renderer* renderer_;
 }
 

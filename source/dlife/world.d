@@ -228,4 +228,51 @@ unittest {
     assert(world[1, 0]);
 }
 
+// ブリンカーのテスト
+unittest {
+    auto world = new World(100, 100);
+
+    // 縦向きブリンカー追加
+    world.addLife(1, 0);
+    world.addLife(1, 1);
+    world.addLife(1, 2);
+
+    world.next();
+
+    // 時刻を進めた時は、横向きになっている
+    assert(world[0, 1]);
+    assert(world[1, 1]);
+    assert(world[2, 1]);
+
+    world.next();
+
+    // 次の時刻でまた縦向きになる
+    assert(world[1, 0]);
+    assert(world[1, 1]);
+    assert(world[1, 2]);
+}
+
+// 端のブリンカーのテスト
+unittest {
+    auto world = new World(100, 100);
+
+    // 世界の端に縦向きブリンカー追加
+    world.addLife(0, 99);
+    world.addLife(0, 0);
+    world.addLife(0, 1);
+
+    world.next();
+
+    // 時刻を進めた時は、横向きになっている
+    assert(world[99, 0]);
+    assert(world[0, 0]);
+    assert(world[1, 0]);
+
+    world.next();
+
+    // 次の時刻でまた縦向きになる
+    assert(world[0, 99]);
+    assert(world[0, 0]);
+    assert(world[0, 1]);
+}
 

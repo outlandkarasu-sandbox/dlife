@@ -7,6 +7,11 @@ module dlife.world;
  */
 class World {
 
+    enum {
+        SURVIVE_COUNT = 2, /// ライフが生き残る数
+        BIRTH_COUNT = 3    /// ライフが誕生する数
+    }
+
     /**
      *  世界の幅と高さを指定して生成する
      *
@@ -62,16 +67,12 @@ class World {
      *  指定座標にライフが存在するか返す
      *
      *  Params:
-     *      x = ライフが存在するか確認する座標
-     *      y = ライフが存在するか確認する座標
+     *      x = ライフが存在するか確認する座標。世界のサイズを超える場合は折り返し。
+     *      y = ライフが存在するか確認する座標。世界のサイズを超える場合は折り返し。
      *  Returns:
      *      ライフが存在する場合はtrue。そうでなければfalse。
      */
-    bool opIndex(size_t x, size_t y) @safe pure
-    in {
-        assert(x < width);
-        assert(y < height);
-    } body {
+    bool opIndex(size_t x, size_t y) @safe pure {
         return currentWorld_[y][x];
     }
 
@@ -100,7 +101,28 @@ class World {
         assert(x < width);
         assert(y < height);
     } body {
-        return false;
+        auto left = (x == 0) ? width - 1 : x - 1;
+        auto up = (y == 0) ? height - 1 : y - 1;
+        auto right = (x == width - 1) ? 0 : x + 1;
+        auto down = (y == height - 1) ? 0 : y + 1;
+
+        auto count = 0;
+        if(this[left, up]) ++count;
+        if(this[x, up]) ++count;
+        if(this[right, up]) ++count;
+
+        if(this[left, y]) ++count;
+        if(this[right, y]) ++count;
+
+        if(this[left, down]) ++count;
+        if(this[x, down]) ++count;
+        if(this[right, down]) ++count;
+
+        if(this[x, y]) {
+            return count == SURVIVE_COUNT || count == BIRTH_COUNT;
+        } else {
+            return count == BIRTH_COUNT;
+        }
     }
 
 private:
@@ -180,4 +202,30 @@ unittest {
     // ライフの死亡
     assert(!world[1, 1]);
 }
+
+// 固定物体のテスト
+unittest {
+    auto world = new World(100, 100);
+
+    // ライフ追加
+    world.addLife(0, 0);
+    world.addLife(0, 1);
+    world.addLife(1, 1);
+    world.addLife(1, 0);
+
+    // 固定物体の生存
+    assert(world[0, 0]);
+    assert(world[0, 1]);
+    assert(world[1, 1]);
+    assert(world[1, 0]);
+
+    world.next();
+
+    // 時刻を進めてもそのまま生存している
+    assert(world[0, 0]);
+    assert(world[0, 1]);
+    assert(world[1, 1]);
+    assert(world[1, 0]);
+}
+
 

@@ -3,7 +3,7 @@ module dlife.main;
 import derelict.sdl2.sdl;
 
 import dlife.exception;
-import dlife.game;
+import dlife.lifegame;
 
 /// モジュール初期化
 static this() {
@@ -20,6 +20,6 @@ void main() {
     scope(exit) SDL_Quit();
 
     // ゲームの実行
-    new Game("test", 320, 240).run();
+    new LifeGame("test", 320, 240, 60).run();
 }
 

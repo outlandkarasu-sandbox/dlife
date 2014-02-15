@@ -23,7 +23,7 @@ class Game {
      *      height = ウィンドウの高さ
      *      fps = 秒間フレーム数
      */
-    @safe nothrow this(string title, uint width, uint height, uint fps = 60) {
+    @safe nothrow this(string title, uint width, uint height, uint fps ) {
         title_ = title;
         width_ = width;
         height_ = height;
@@ -67,15 +67,12 @@ class Game {
 protected:
 
     /**
-     *  メインループ
+     *  描画関数
      *
      *  Params:
      *      renderer = 描画用レンダラ
      */
-    void draw(SDL_Renderer* renderer) {
-        SDL_SetRenderDrawColor(renderer, Uint8.max, Uint8.max, Uint8.max, Uint8.max);
-        SDL_RenderDrawPoint(renderer, 100, 100);
-    }
+    abstract void draw(SDL_Renderer* renderer);
 
     /**
      *  メインループ

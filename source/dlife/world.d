@@ -125,6 +125,26 @@ class World {
         }
     }
 
+    /**
+     *  生存しているライフを巡回する。
+     *
+     *  Params:
+     *      dg = 生存しているライフを与えられるデリゲート
+     */
+    int opApply(int delegate(size_t x, size_t y) dg) {
+        foreach(y, row; currentWorld_) {
+            foreach(x, life; row) {
+                if(life) {
+                    auto result = dg(x, y);
+                    if(result) {
+                        return result;
+                    }
+                }
+            }
+        }
+        return 0;
+    }
+
 private:
 
     /**

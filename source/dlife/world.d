@@ -1,5 +1,7 @@
 module dlife.world;
 
+import std.typetuple : TypeTuple;
+
 /**
  *  ライフゲームの世界クラス
  *
@@ -107,18 +109,17 @@ class World {
         auto down = (y == height - 1) ? 0 : y + 1;
 
         auto count = 0;
-        if(this[left, up]) ++count;
-        if(this[x, up]) ++count;
-        if(this[right, up]) ++count;
+        foreach(rowIndex; TypeTuple!(up, y, down)) {
+            auto row = currentWorld_[rowIndex];
+            foreach(colIndex; TypeTuple!(left, x, right)) {
+                if(row[colIndex]) {
+                    ++count;
+                }
+            }
+        }
 
-        if(this[left, y]) ++count;
-        if(this[right, y]) ++count;
-
-        if(this[left, down]) ++count;
-        if(this[x, down]) ++count;
-        if(this[right, down]) ++count;
-
-        if(this[x, y]) {
+        if(currentWorld_[y][x]) {
+            --count; // 現在のセルにいるライフは除外する
             return count == SURVIVE_COUNT || count == BIRTH_COUNT;
         } else {
             return count == BIRTH_COUNT;

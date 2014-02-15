@@ -20,6 +20,6 @@ void main() {
     scope(exit) SDL_Quit();
 
     // ゲームの実行
-    new LifeGame("test", 320, 240, 60).run();
+    new LifeGame("test", 640, 480, 60).run();
 }
 

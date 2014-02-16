@@ -51,6 +51,24 @@ struct Buffer(T) {
     }
 
     /**
+     *  バッファに1つ値を追加する。
+     *  バッファが一杯になった場合、flushを呼び出す。
+     *
+     *  Params:
+     *      values = バッファに追加する値
+     */
+    const(T) opOpAssign(string op)(const(T) value) if(op == "~")
+    in {
+        assert(capacity > 0);
+    } body {
+        buffer_[end_++] = value;
+        if(capacity == 0) {
+            flush();
+        }
+        return value;
+    }
+
+    /**
      *  バッファにあるデータを使ってフラッシュ処理を行う。
      *  処理完了後、バッファを空に戻す。
      */
@@ -159,6 +177,34 @@ unittest {
 
     // 値をもう1個追加
     buffer.add(1);
+
+    // バッファはflushされている
+    assert(buffer.length == 2);
+    assert(buffer.capacity == 2);
+    assert(buffer.used == 0);
+
+    // 処理が呼び出されている
+    assert(calledValues[] == [0, 1], to!string(calledValues));
+}
+
+// サイズ2のバッファの値追加テスト
+unittest {
+    const(int)[] calledValues;
+    auto buffer = Buffer!int(2, (values){calledValues = values.dup;});
+
+    // 値を1個追加
+    buffer ~= 0;
+
+    // バッファはflushされていない
+    assert(buffer.length == 2);
+    assert(buffer.capacity == 1);
+    assert(buffer.used == 1);
+
+    // 処理は呼び出されていない
+    assert(calledValues.length == 0);
+
+    // 値をもう1個追加
+    buffer ~= 1;
 
     // バッファはflushされている
     assert(buffer.length == 2);

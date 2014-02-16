@@ -81,14 +81,16 @@ class World {
     /// 次の時刻へ進む
     void next() {
         // 全セルについてライフが存在するか計算する
+        auto nextColRow = nextWorld;
         foreach(y, row; currentWorld_) {
+            auto nextRow = nextColRow[y];
             foreach(x, life; row) {
-                nextWorld[y][x] = willSurvive(x, y);
+                nextRow[x] = willSurvive(x, y);
             }
         }
 
         // 次の時刻の世界に入れ替える
-        currentWorld_ = nextWorld;
+        currentWorld_ = nextColRow;
     }
 
     /**

@@ -60,7 +60,7 @@ class LifeGame : Game {
         renderer_ = renderer;
         SDL_SetRenderDrawColor(renderer, Uint8.max, Uint8.max, Uint8.max, Uint8.max);
         foreach(x, y; world_) {
-            pointBuffer_.add(SDL_Point(cast(int) x, cast(int) y));
+            pointBuffer_ ~= SDL_Point(cast(int) x, cast(int) y);
         }
 
         // 点バッファを描画

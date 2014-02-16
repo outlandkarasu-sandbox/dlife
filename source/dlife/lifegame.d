@@ -3,6 +3,7 @@
  */
 module dlife.lifegame;
 
+import std.parallelism : task;
 import std.random : dice;
 
 import derelict.sdl2.sdl;
@@ -15,7 +16,7 @@ import dlife.buffer : Buffer;
 enum INITIAL_LIFE_PROPORTION = 0.5;
 
 /// 描画時の点バッファサイズ
-enum POINT_BUFFER_SIZE = 1000;
+enum POINT_BUFFER_SIZE = 500000;
 
 /**
  *  ライフゲームの実装
@@ -57,6 +58,27 @@ class LifeGame : Game {
      *      renderer = 描画用レンダラ
      */
     protected override void draw(SDL_Renderer* renderer) {
+        // 別スレッドで次の時刻の世界の生成
+        auto createNextTask = task({world_.createNextWorld;});
+        createNextTask.executeInNewThread();
+
+        // 現在時刻の描画
+        renderCurrentWorld(renderer);
+
+        // 処理完了を待って次の時代へ入れ替え
+        createNextTask.yieldForce;
+        world_.flipNext();
+    }
+
+private:
+
+    /**
+     *  現在時刻の世界を描画する
+     *
+     *  Params:
+     *      renderer = 描画用レンダラ
+     */
+    void renderCurrentWorld(SDL_Renderer* renderer) {
         renderer_ = renderer;
         SDL_SetRenderDrawColor(renderer, Uint8.max, Uint8.max, Uint8.max, Uint8.max);
         foreach(x, y; world_) {
@@ -65,12 +87,7 @@ class LifeGame : Game {
 
         // 点バッファを描画
         pointBuffer_.flush();
-
-        // 次の時代へ
-        world_.next();
     }
-
-private:
 
     /**
      *  点バッファの描画

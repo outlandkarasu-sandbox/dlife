@@ -5,6 +5,18 @@ import derelict.sdl2.sdl;
 import dlife.exception;
 import dlife.lifegame;
 
+/// ウィンドウの幅
+enum WINDOW_WIDTH = 1920;
+
+/// ウィンドウの高さ
+enum WINDOW_HEIGHT = 1080;
+
+/// FPS
+enum FPS = 60;
+
+/// ウィンドウタイトル
+enum WINDOW_TITLE = "dlife";
+
 /// モジュール初期化
 static this() {
     // SDLライブラリのロード
@@ -20,6 +32,6 @@ void main() {
     scope(exit) SDL_Quit();
 
     // ゲームの実行
-    new LifeGame("test", 640, 480, 60).run();
+    new LifeGame(WINDOW_TITLE, WINDOW_WIDTH, WINDOW_HEIGHT, FPS).run();
 }
 

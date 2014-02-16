@@ -1,5 +1,6 @@
 module dlife.world;
 
+import std.parallelism : parallel;
 import std.typetuple : TypeTuple;
 
 /**
@@ -78,19 +79,36 @@ class World {
         return currentWorld_[y][x];
     }
 
-    /// 次の時刻へ進む
-    void next() {
+    /**
+     *  次の時刻の状態を計算する
+     *
+     *  現在時刻の情報には影響を与えないため、
+     *  現在時刻の処理と並列実行可能。
+     */
+    void createNextWorld() {
         // 全セルについてライフが存在するか計算する
         auto nextColRow = nextWorld;
-        foreach(y, row; currentWorld_) {
+        foreach(y, row; parallel(currentWorld_)) {
             auto nextRow = nextColRow[y];
             foreach(x, life; row) {
                 nextRow[x] = willSurvive(x, y);
             }
         }
+    }
 
-        // 次の時刻の世界に入れ替える
-        currentWorld_ = nextColRow;
+    /// 次の時刻の世界に入れ替える
+    void flipNext() {
+        currentWorld_ = nextWorld;
+    }
+
+    /**
+     *  次の時刻へ進む
+     *
+     *  createNextWorldとflipNextを順番に呼び出す。
+     */
+    void next() {
+        createNextWorld();
+        flipNext();
     }
 
     /**
@@ -105,10 +123,10 @@ class World {
         assert(x < width);
         assert(y < height);
     } body {
-        auto left = (x == 0) ? width - 1 : x - 1;
-        auto up = (y == 0) ? height - 1 : y - 1;
-        auto right = (x == width - 1) ? 0 : x + 1;
-        auto down = (y == height - 1) ? 0 : y + 1;
+        auto left = (x == 0) ? width_ - 1 : x - 1;
+        auto up = (y == 0) ? height_ - 1 : y - 1;
+        auto right = (x == width_ - 1) ? 0 : x + 1;
+        auto down = (y == height_ - 1) ? 0 : y + 1;
 
         auto count = 0;
         foreach(rowIndex; TypeTuple!(up, y, down)) {

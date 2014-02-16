@@ -6,7 +6,5 @@
 	"authors": ["outlandkarasu"],
 	"dependencies": {
                 "derelict-sdl2": "~master"
-	},
-        "buildOptions": ["unittests"]
-
+	}
 }
